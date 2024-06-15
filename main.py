@@ -2,8 +2,11 @@ import csv
 import datetime
 import json
 import os
+from pathlib import Path
+
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
 from time import sleep, time
 from config import bananas
 
@@ -93,7 +96,33 @@ class Parser:
             return -1
         else:
             df = pd.read_csv('stats.csv', encoding='cp1251')
-            print(df.head())
+            df['Дата'] = pd.to_datetime(df['Дата'], format='%d.%m.%Y %H:%M:%S')
+
+            repeated_names = df['Название'].value_counts()
+            repeated_names = repeated_names[repeated_names > 1].index.tolist()
+
+            for name in repeated_names:
+                subset = df[df['Название'] == name]
+                plt.figure(figsize=(10, 6))
+
+                plt.plot(subset['Дата'], subset['Цена покупки'], label='Цена покупки', color='blue', marker='o')
+
+                plt.plot(subset['Дата'], subset['Цена продажи'], label='Цена продажи', color='red', marker='o')
+
+                plt.title(f'Цены для {name}')
+                plt.xlabel('Дата')
+                plt.ylabel('Цена')
+                plt.legend()
+                plt.grid(True)
+                plt.xticks(rotation=45)
+
+                filename = f'./graphs/{name}.jpg'
+                if not os.path.exists('./graphs'):
+                    output_dir = Path('./graphs')
+                    output_dir.mkdir(parents=True, exist_ok=True)
+                plt.savefig(filename, format='jpg')
+
+                plt.close()
 
 
 if __name__ == '__main__':
