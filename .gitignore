@@ -2,4 +2,5 @@
 venv
 graphs
 __pycache__
+csv
 *.csv

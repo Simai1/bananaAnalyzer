@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 from pathlib import Path
+from config import bananas as cnfg_bananas
 
 import requests
 import pandas as pd
@@ -27,10 +28,7 @@ def timer(func):
 
 class Parser:
     url = 'https://steamcommunity.com/market/itemordershistogram?country=RU&language=russian&currency=5&item_nameid='
-    bananas = dict()
-
-    def __init__(self, bananas):
-        self.bananas = bananas
+    bananas = cnfg_bananas
 
     @timer
     def parse(self):
@@ -80,21 +78,24 @@ class Parser:
 
     @timer
     def write_file(self, stats):
-        if not os.path.exists('./stats.csv'):
-            with open('stats.csv', 'w', encoding='cp1251', newline='') as file:
+        if not os.path.exists('./csv'):
+            output_dir = Path('./csv')
+            output_dir.mkdir(parents=True, exist_ok=True)
+        if not os.path.exists('./csv/stats.csv'):
+            with open('./csv/stats.csv', 'w', encoding='cp1251', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(['Название', 'id', 'Цена покупки', 'Цена продажи', 'Дата'])
-        with open('stats.csv', 'a', encoding='cp1251', newline='') as file:
+        with open('./csv/stats.csv', 'a', encoding='cp1251', newline='') as file:
             writer = csv.writer(file)
             for item in stats:
                 writer.writerow(item.values())
 
     @timer
     def analyze(self):
-        if not os.path.exists('./stats.csv'):
+        if not os.path.exists('./csv/stats.csv'):
             return -1
         else:
-            df = pd.read_csv('stats.csv', encoding='cp1251')
+            df = pd.read_csv('./csv/stats.csv', encoding='cp1251')
             df['Дата'] = pd.to_datetime(df['Дата'], format='%d.%m.%Y %H:%M:%S')
 
             repeated_names = df['Название'].value_counts()
