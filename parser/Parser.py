@@ -78,24 +78,24 @@ class Parser:
 
     @timer
     def write_file(self, stats):
-        if not os.path.exists('./csv'):
-            output_dir = Path('./csv')
+        if not os.path.exists('csv'):
+            output_dir = Path('csv')
             output_dir.mkdir(parents=True, exist_ok=True)
-        if not os.path.exists('./csv/stats.csv'):
-            with open('./csv/stats.csv', 'w', encoding='cp1251', newline='') as file:
+        if not os.path.exists('csv/stats.csv'):
+            with open('csv/stats.csv', 'w', encoding='cp1251', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(['Название', 'id', 'Цена покупки', 'Цена продажи', 'Дата'])
-        with open('./csv/stats.csv', 'a', encoding='cp1251', newline='') as file:
+        with open('csv/stats.csv', 'a', encoding='cp1251', newline='') as file:
             writer = csv.writer(file)
             for item in stats:
                 writer.writerow(item.values())
 
     @timer
     def analyze(self):
-        if not os.path.exists('./csv/stats.csv'):
+        if not os.path.exists('csv/stats.csv'):
             return -1
         else:
-            df = pd.read_csv('./csv/stats.csv', encoding='cp1251')
+            df = pd.read_csv('csv/stats.csv', encoding='cp1251')
             df['Дата'] = pd.to_datetime(df['Дата'], format='%d.%m.%Y %H:%M:%S')
 
             repeated_names = df['Название'].value_counts()
@@ -116,9 +116,9 @@ class Parser:
                 plt.grid(True)
                 plt.xticks(rotation=45)
 
-                filename = f'./graphs/{name}.jpg'
-                if not os.path.exists('./graphs'):
-                    output_dir = Path('./graphs')
+                filename = f'graphs/{name}.jpg'
+                if not os.path.exists('graphs'):
+                    output_dir = Path('graphs')
                     output_dir.mkdir(parents=True, exist_ok=True)
                 plt.savefig(filename, format='jpg')
 
